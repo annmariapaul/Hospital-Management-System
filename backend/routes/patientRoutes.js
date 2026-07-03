@@ -13,4 +13,8 @@ router.get("/", authMiddleware, patientController.getPatients);
 // Search Patients
 router.get("/search", authMiddleware, patientController.searchPatients);
 
+//delete Patients
+router.delete("/:id", authMiddleware, patientController.deletePatient);
+
+
 module.exports = router;

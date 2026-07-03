@@ -2,6 +2,7 @@ const { Patient } = require("../models");
 const { Op } = require("sequelize");
 
 // Add Patient
+// Add Patient
 exports.addPatient = async (req, res) => {
   try {
     const { patient_name, bed_id } = req.body;
@@ -9,6 +10,20 @@ exports.addPatient = async (req, res) => {
     if (!patient_name || !bed_id) {
       return res.status(400).json({
         message: "Patient name and Bed ID are required",
+      });
+    }
+
+    // Check if the bed is already assigned to another patient
+    const existingPatient = await Patient.findOne({
+      where: {
+        bed_id,
+        user_id: req.user.id,
+      },
+    });
+
+    if (existingPatient) {
+      return res.status(400).json({
+        message: "Bed ID is already assigned to another patient.",
       });
     }
 
@@ -76,6 +91,36 @@ exports.searchPatients = async (req, res) => {
     });
 
     res.status(200).json(patients);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+};
+
+// Delete Patient
+exports.deletePatient = async (req, res) => {
+  try {
+    const patient = await Patient.findOne({
+      where: {
+        id: req.params.id,
+        user_id: req.user.id,
+      },
+    });
+
+    if (!patient) {
+      return res.status(404).json({
+        message: "Patient not found",
+      });
+    }
+
+    await patient.destroy();
+
+    res.status(200).json({
+      message: "Patient deleted successfully",
+    });
   } catch (error) {
     console.error(error);
 

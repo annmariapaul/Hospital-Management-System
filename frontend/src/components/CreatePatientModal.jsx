@@ -19,6 +19,11 @@ export default function CreatePatientModal({
   });
   if (!open) return null;
 
+  const resetForm = () => {
+    setPatientName("");
+    setBedId("");
+  };
+
   const savePatient = async () => {
     if (!patientName.trim()) {
       setAlert({
@@ -64,8 +69,7 @@ export default function CreatePatientModal({
         message: "Patient created successfully.",
         type: "success",
         onConfirm: () => {
-          setPatientName("");
-          setBedId("");
+          resetForm();
 
           if (onPatientAdded) {
             onPatientAdded(res.data.patient);
@@ -156,7 +160,10 @@ export default function CreatePatientModal({
             </button>
 
             <button
-              onClick={onClose}
+              onClick={() => {
+                resetForm();
+                onClose();
+              }}
               className="px-8 py-2 rounded-md border border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
             >
               Cancel
